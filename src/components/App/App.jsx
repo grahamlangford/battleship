@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import classNames from 'classnames'
 
 import Typography from '@material-ui/core/Typography'
+import Grid from '@material-ui/core/Grid'
 import { makeStyles } from '@material-ui/styles'
 
 import gameboard from '../../engine/gameboard/gameboard'
@@ -30,6 +31,17 @@ const useStyles = makeStyles({
   },
   displayBlock: {
     display: 'block'
+  },
+  root: {
+    width: '100%'
+  },
+  board: {
+    flex: '2 1 auto',
+    width: '100%'
+  },
+  text: {
+    flex: '1 1 auto',
+    with: '100%'
   }
 })
 
@@ -84,47 +96,73 @@ const App = () => {
       >
         {`${player}'s Turn`}
       </Typography>
-      <Board
-        game={game1}
-        startingShips={ships1}
-        setMessage={setMessage}
-        setError={setError}
-        togglePlayer={togglePlayer}
-        incrementTurn={incrementTurn}
-        setTransition={() => setTransition(true)}
-        display={classNames({
-          [classes.displayNone]: transition || board !== 'Board 1'
-        })}
-      />
-      <Board
-        game={game2}
-        startingShips={ships2}
-        setMessage={setMessage}
-        setError={setError}
-        togglePlayer={togglePlayer}
-        incrementTurn={incrementTurn}
-        setTransition={() => setTransition(true)}
-        display={classNames({
-          [classes.displayNone]: transition || board !== 'Board 2'
-        })}
-      />
-      <Typography
-        variant="h4"
-        align="center"
-        className={classNames({ [classes.displayNone]: transition })}
-        gutterBottom
+      <Grid
+        className={classes.root}
+        spacing={0}
+        container
+        justify="flex-start"
+        direction={board === 'Board 1' ? 'column' : 'column-reverse'}
       >
-        {error.message}
-      </Typography>
-      <Typography
-        variant="h1"
-        align="center"
-        className={classNames(classes.displayNone, {
-          [classes.displayBlock]: message.message === 'All sunk!'
-        })}
-      >
-        {`${player} is the victor!`}
-      </Typography>
+        <Grid item xs={12} className={classes.board}>
+          <Board
+            game={game1}
+            startingShips={ships1}
+            isOpponent={board === 'Board 2'}
+            setMessage={setMessage}
+            setError={setError}
+            togglePlayer={togglePlayer}
+            incrementTurn={incrementTurn}
+            setTransition={() => setTransition(true)}
+            display={classNames({
+              [classes.displayNone]: transition
+            })}
+          />
+        </Grid>
+        <Grid item xs={12} className={classes.text}>
+          <Typography
+            variant="h4"
+            align="center"
+            className={classNames({ [classes.displayNone]: transition })}
+            gutterBottom
+          >
+            {error.message}
+          </Typography>
+          <Typography
+            variant="h1"
+            align="center"
+            className={classNames(classes.displayNone, {
+              [classes.displayBlock]: message.message === 'All sunk!'
+            })}
+          >
+            {`${player} is the victor!`}
+          </Typography>
+          <Typography
+            variant="h4"
+            align="center"
+            gutterBottom
+            className={classNames({
+              [classes.displayNone]: transition
+            })}
+          >
+            Opponent&apos;s Board
+          </Typography>
+        </Grid>
+        <Grid item xs={12} className={classes.board}>
+          <Board
+            game={game2}
+            startingShips={ships2}
+            isOpponent={board === 'Board 1'}
+            setMessage={setMessage}
+            setError={setError}
+            togglePlayer={togglePlayer}
+            incrementTurn={incrementTurn}
+            setTransition={() => setTransition(true)}
+            display={classNames({
+              [classes.displayNone]: transition
+            })}
+          />
+        </Grid>
+      </Grid>
     </>
   )
 }

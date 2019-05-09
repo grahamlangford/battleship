@@ -15,6 +15,7 @@ import useStyles from './Board.styles'
 const Board = ({
   game,
   startingShips,
+  isOpponent,
   setMessage,
   setError,
   togglePlayer,
@@ -69,7 +70,7 @@ const Board = ({
   }
 
   return (
-    <div className={display}>
+    <div className={classNames(display, classes.board)}>
       <Grid container justify="center" spacing={40}>
         <Grid item xs={12} sm={8} md={6}>
           <Grid container justify="center" spacing={0}>
@@ -85,7 +86,9 @@ const Board = ({
                       [classes.cardHit]: location && location.hit,
                       [classes.cardMiss]: location === 'miss'
                     })}
-                    onClick={() => handleCardClick(x, y)}
+                    onClick={() =>
+                      isOpponent ? () => {} : handleCardClick(x, y)
+                    }
                   />
                 ))}
               </Grid>
@@ -93,7 +96,7 @@ const Board = ({
           </Grid>
         </Grid>
 
-        {ships.length > 0 && (
+        {ships.length > 0 && !isOpponent && (
           <Grid item xs={12} sm={4}>
             <Grid container justify="center" spacing={8}>
               {ships.map(boat => (
@@ -133,6 +136,7 @@ const Board = ({
 Board.propTypes = {
   game: PropTypes.object.isRequired,
   startingShips: PropTypes.array.isRequired,
+  isOpponent: PropTypes.bool.isRequired,
   setMessage: PropTypes.func.isRequired,
   setError: PropTypes.func.isRequired,
   togglePlayer: PropTypes.func.isRequired,

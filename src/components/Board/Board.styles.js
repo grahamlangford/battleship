@@ -2,6 +2,9 @@ import { makeStyles } from '@material-ui/styles'
 
 export default makeStyles(theme => {
   return {
+    board: {
+      margin: 16
+    },
     formControl: {
       margin: 4,
       marginLeft: 16,
