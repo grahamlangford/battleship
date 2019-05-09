@@ -10,10 +10,16 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 
 import constants from '../../engine/constants'
-import { actions } from '../../reducers/pvp'
 import useStyles from './Board.styles'
 
-const Board = ({ game, startingShips, isOpponent, dispatch, display }) => {
+const Board = ({
+  game,
+  startingShips,
+  isOpponent,
+  dispatch,
+  actions,
+  display
+}) => {
   const classes = useStyles()
   const [selectedShip, setSelectedShip] = useState(null)
   const [isVertical, setIsVertical] = useState(false)
@@ -131,6 +137,7 @@ Board.propTypes = {
   startingShips: PropTypes.array.isRequired,
   isOpponent: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
+  actions: PropTypes.object.isRequired,
   display: PropTypes.string.isRequired
 }
 

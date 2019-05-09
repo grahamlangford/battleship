@@ -90,6 +90,7 @@ const App = () => {
             startingShips={ships1}
             isOpponent={board === 'Board 2'}
             dispatch={dispatch}
+            actions={actions}
             toggleTransition={() => dispatch(actions.toggleTransition())}
             display={classNames({
               [classes.displayNone]: transition || turn === -1
@@ -131,6 +132,7 @@ const App = () => {
             startingShips={ships2}
             isOpponent={board === 'Board 1'}
             dispatch={dispatch}
+            actions={actions}
             display={classNames({
               [classes.displayNone]: transition || turn === -2
             })}
