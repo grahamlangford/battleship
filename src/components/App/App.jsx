@@ -1,57 +1,41 @@
-import React, { useState, useEffect } from 'react'
+import React, { useReducer, useEffect } from 'react'
 import classNames from 'classnames'
 
 import AppBar from '@material-ui/core/AppBar'
 import ToolBar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
+import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 
-import gameboard from '../../engine/gameboard/gameboard'
-import ship from '../../engine/ship/ship'
+import pvpReducer, { actions, initialState } from '../../reducers/pvp'
 import Board from '../Board'
 import Transition from '../Transition'
 import useStyles from './App.styles'
 
-const ships1 = [
-  ship('destroyer', 2),
-  ship('submarine', 3),
-  ship('cruiser', 3),
-  ship('battleship', 4),
-  ship('carrier', 5)
-]
-const ships2 = [
-  ship('destroyer', 2),
-  ship('submarine', 3),
-  ship('cruiser', 3),
-  ship('battleship', 4),
-  ship('carrier', 5)
-]
-
-const game1 = gameboard()
-game1.create(10, 10)
-const game2 = gameboard()
-game2.create(10, 10)
-
 const App = () => {
   const classes = useStyles()
 
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
-  const [player, setPlayer] = useState('Player 1')
-  const [turn, setTurn] = useState(-2)
-  const [board, setBoard] = useState('Board 1')
-  const [transition, setTransition] = useState(true)
-
-  const togglePlayer = () =>
-    player === 'Player 1' ? setPlayer('Player 2') : setPlayer('Player 1')
-
-  const incrementTurn = () => setTurn(turn + 1)
+  const [
+    {
+      message,
+      error,
+      player,
+      turn,
+      board,
+      transition,
+      ships1,
+      ships2,
+      game1,
+      game2
+    },
+    dispatch
+  ] = useReducer(pvpReducer, initialState)
 
   useEffect(() => {
     if (Object.is(turn % 2, -0) || turn % 2 === 1) {
-      setBoard('Board 1')
+      dispatch(actions.setBoard('Board 1'))
     } else if (turn % 2 === -1 || turn % 2 === 0) {
-      setBoard('Board 2')
+      dispatch(actions.setBoard('Board 2'))
     }
   }, [turn])
 
@@ -62,6 +46,10 @@ const App = () => {
           <Typography variant="h6" color="inherit">
             Battleship
           </Typography>
+          <div className={classes.grow} />
+          <Button color="inherit" onClick={() => dispatch(actions.reset())}>
+            New Game
+          </Button>
         </ToolBar>
       </AppBar>
       <Typography
@@ -72,11 +60,11 @@ const App = () => {
         })}
         gutterBottom
       >
-        {message.message}
+        {message}
       </Typography>
       <Transition
         player={player}
-        onClick={() => setTransition(false)}
+        onClick={() => dispatch(actions.toggleTransition())}
         display={classNames({ [classes.displayNone]: !transition })}
       />
       <Typography
@@ -101,11 +89,8 @@ const App = () => {
             game={game1}
             startingShips={ships1}
             isOpponent={board === 'Board 2'}
-            setMessage={setMessage}
-            setError={setError}
-            togglePlayer={togglePlayer}
-            incrementTurn={incrementTurn}
-            setTransition={() => setTransition(true)}
+            dispatch={dispatch}
+            toggleTransition={() => dispatch(actions.toggleTransition())}
             display={classNames({
               [classes.displayNone]: transition || turn === -1
             })}
@@ -118,13 +103,13 @@ const App = () => {
             className={classNames({ [classes.displayNone]: transition })}
             gutterBottom
           >
-            {error.message}
+            {error}
           </Typography>
           <Typography
             variant="h1"
             align="center"
             className={classNames(classes.displayNone, {
-              [classes.displayBlock]: message.message === 'All sunk!'
+              [classes.displayBlock]: message === 'All sunk!'
             })}
           >
             {`${player} is the victor!`}
@@ -145,11 +130,7 @@ const App = () => {
             game={game2}
             startingShips={ships2}
             isOpponent={board === 'Board 1'}
-            setMessage={setMessage}
-            setError={setError}
-            togglePlayer={togglePlayer}
-            incrementTurn={incrementTurn}
-            setTransition={() => setTransition(true)}
+            dispatch={dispatch}
             display={classNames({
               [classes.displayNone]: transition || turn === -2
             })}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import shortid from 'shortid'
 import classNames from 'classnames'
@@ -10,23 +10,16 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 
 import constants from '../../engine/constants'
+import { actions } from '../../reducers/pvp'
 import useStyles from './Board.styles'
 
-const Board = ({
-  game,
-  startingShips,
-  isOpponent,
-  setMessage,
-  setError,
-  togglePlayer,
-  incrementTurn,
-  setTransition,
-  display
-}) => {
+const Board = ({ game, startingShips, isOpponent, dispatch, display }) => {
   const classes = useStyles()
   const [selectedShip, setSelectedShip] = useState(null)
   const [isVertical, setIsVertical] = useState(false)
   const [ships, setShips] = useState(startingShips)
+
+  useEffect(() => setShips(startingShips), [startingShips])
 
   const handleCardClick = (x, y) => {
     if (ships.length > 0 && selectedShip) {
@@ -42,29 +35,29 @@ const Board = ({
           boat => boat.getName() !== selectedShip.getName()
         )
         if (newShips.length === 0) {
-          togglePlayer()
-          incrementTurn()
-          setTransition()
+          dispatch(actions.togglePlayer())
+          dispatch(actions.incrementTurn())
+          dispatch(actions.toggleTransition())
         }
 
         setShips(newShips)
         setSelectedShip(null)
-        setError({ message: '' })
+        dispatch(actions.setError(''))
       } catch (error) {
-        setError({ message: error.message })
+        dispatch(actions.setError(error.message))
       }
     } else if (ships.length === 0) {
       try {
-        const newMessage = { message: game.receiveAttack(x, y) }
-        setMessage(game.allSunk() ? { message: 'All sunk!' } : newMessage)
-        setError({ message: '' })
+        const newMessage = game.receiveAttack(x, y)
+        dispatch(actions.setMessage(game.allSunk() ? 'All sunk!' : newMessage))
+        dispatch(actions.setError(''))
         if (!game.allSunk()) {
-          togglePlayer()
-          incrementTurn()
-          setTransition()
+          dispatch(actions.togglePlayer())
+          dispatch(actions.incrementTurn())
+          dispatch(actions.toggleTransition())
         }
       } catch (error) {
-        setError({ message: error.message })
+        dispatch(actions.setError(error.message))
       }
     }
   }
@@ -114,7 +107,7 @@ const Board = ({
               <Grid item>
                 <FormControlLabel
                   className={classes.formControl}
-                  label="Vertical"
+                  label="Rotate"
                   control={(
                     <Checkbox
                       checked={isVertical}
@@ -137,11 +130,7 @@ Board.propTypes = {
   game: PropTypes.object.isRequired,
   startingShips: PropTypes.array.isRequired,
   isOpponent: PropTypes.bool.isRequired,
-  setMessage: PropTypes.func.isRequired,
-  setError: PropTypes.func.isRequired,
-  togglePlayer: PropTypes.func.isRequired,
-  incrementTurn: PropTypes.func.isRequired,
-  setTransition: PropTypes.func.isRequired,
+  dispatch: PropTypes.func.isRequired,
   display: PropTypes.string.isRequired
 }
 

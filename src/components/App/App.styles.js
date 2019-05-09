@@ -20,5 +20,8 @@ export default makeStyles({
   },
   marginTop: {
     marginTop: 32
+  },
+  grow: {
+    flexGrow: 1
   }
 })
