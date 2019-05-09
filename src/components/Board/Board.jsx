@@ -16,6 +16,7 @@ const Board = ({
   game,
   startingShips,
   setMessage,
+  setError,
   togglePlayer,
   incrementTurn,
   setTransition,
@@ -47,20 +48,22 @@ const Board = ({
 
         setShips(newShips)
         setSelectedShip(null)
+        setError({ message: '' })
       } catch (error) {
-        setMessage({ message: error.message })
+        setError({ message: error.message })
       }
     } else if (ships.length === 0) {
       try {
         const newMessage = { message: game.receiveAttack(x, y) }
         setMessage(game.allSunk() ? { message: 'All sunk!' } : newMessage)
+        setError({ message: '' })
         if (!game.allSunk()) {
           togglePlayer()
           incrementTurn()
           setTransition()
         }
       } catch (error) {
-        setMessage({ message: error.message })
+        setError({ message: error.message })
       }
     }
   }
@@ -131,6 +134,7 @@ Board.propTypes = {
   game: PropTypes.object.isRequired,
   startingShips: PropTypes.array.isRequired,
   setMessage: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
   togglePlayer: PropTypes.func.isRequired,
   incrementTurn: PropTypes.func.isRequired,
   setTransition: PropTypes.func.isRequired,

@@ -9,8 +9,20 @@ import ship from '../../engine/ship/ship'
 import Board from '../Board'
 import Transition from '../Transition'
 
-const ships1 = [ship('destroyer', 3), ship('cruiser', 4), ship('battleship', 5)]
-const ships2 = [ship('destroyer', 3), ship('cruiser', 4), ship('battleship', 5)]
+const ships1 = [
+  ship('destroyer', 2),
+  ship('submarine', 3),
+  ship('cruiser', 3),
+  ship('battleship', 4),
+  ship('carrier', 5)
+]
+const ships2 = [
+  ship('destroyer', 2),
+  ship('submarine', 3),
+  ship('cruiser', 3),
+  ship('battleship', 4),
+  ship('carrier', 5)
+]
 
 const useStyles = makeStyles({
   displayNone: {
@@ -30,6 +42,7 @@ const App = () => {
   const classes = useStyles()
 
   const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
   const [player, setPlayer] = useState('Player 1')
   const [turn, setTurn] = useState(-2)
   const [board, setBoard] = useState('Board 1')
@@ -75,6 +88,7 @@ const App = () => {
         game={game1}
         startingShips={ships1}
         setMessage={setMessage}
+        setError={setError}
         togglePlayer={togglePlayer}
         incrementTurn={incrementTurn}
         setTransition={() => setTransition(true)}
@@ -86,6 +100,7 @@ const App = () => {
         game={game2}
         startingShips={ships2}
         setMessage={setMessage}
+        setError={setError}
         togglePlayer={togglePlayer}
         incrementTurn={incrementTurn}
         setTransition={() => setTransition(true)}
@@ -93,6 +108,14 @@ const App = () => {
           [classes.displayNone]: transition || board !== 'Board 2'
         })}
       />
+      <Typography
+        variant="h4"
+        align="center"
+        className={classNames({ [classes.displayNone]: transition })}
+        gutterBottom
+      >
+        {error.message}
+      </Typography>
       <Typography
         variant="h1"
         align="center"
