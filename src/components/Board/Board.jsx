@@ -96,7 +96,7 @@ const Board = ({
           </Grid>
         </Grid>
 
-        {ships.length > 0 && !isOpponent && (
+        {ships.length > 0 && (
           <Grid item xs={12} sm={4}>
             <Grid container justify="center" spacing={8}>
               {ships.map(boat => (

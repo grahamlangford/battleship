@@ -114,7 +114,7 @@ const App = () => {
             incrementTurn={incrementTurn}
             setTransition={() => setTransition(true)}
             display={classNames({
-              [classes.displayNone]: transition
+              [classes.displayNone]: transition || turn === -1
             })}
           />
         </Grid>
@@ -141,7 +141,7 @@ const App = () => {
             align="center"
             gutterBottom
             className={classNames({
-              [classes.displayNone]: transition
+              [classes.displayNone]: transition || turn < 0
             })}
           >
             Opponent&apos;s Board
@@ -158,7 +158,7 @@ const App = () => {
             incrementTurn={incrementTurn}
             setTransition={() => setTransition(true)}
             display={classNames({
-              [classes.displayNone]: transition
+              [classes.displayNone]: transition || turn === -2
             })}
           />
         </Grid>
