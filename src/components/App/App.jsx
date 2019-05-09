@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import classNames from 'classnames'
 
+import AppBar from '@material-ui/core/AppBar'
+import ToolBar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
-import { makeStyles } from '@material-ui/styles'
 
 import gameboard from '../../engine/gameboard/gameboard'
 import ship from '../../engine/ship/ship'
 import Board from '../Board'
 import Transition from '../Transition'
+import useStyles from './App.styles'
 
 const ships1 = [
   ship('destroyer', 2),
@@ -24,26 +26,6 @@ const ships2 = [
   ship('battleship', 4),
   ship('carrier', 5)
 ]
-
-const useStyles = makeStyles({
-  displayNone: {
-    display: 'none'
-  },
-  displayBlock: {
-    display: 'block'
-  },
-  root: {
-    width: '100%'
-  },
-  board: {
-    flex: '2 1 auto',
-    width: '100%'
-  },
-  text: {
-    flex: '1 1 auto',
-    with: '100%'
-  }
-})
 
 const game1 = gameboard()
 game1.create(10, 10)
@@ -75,10 +57,19 @@ const App = () => {
 
   return (
     <>
+      <AppBar position="static">
+        <ToolBar>
+          <Typography variant="h6" color="inherit">
+            Battleship
+          </Typography>
+        </ToolBar>
+      </AppBar>
       <Typography
         variant="h4"
         align="center"
-        className={classNames({ [classes.displayNone]: !transition })}
+        className={classNames(classes.marginTop, {
+          [classes.displayNone]: !transition
+        })}
         gutterBottom
       >
         {message.message}
@@ -92,7 +83,9 @@ const App = () => {
         variant="h3"
         align="center"
         gutterBottom
-        className={classNames({ [classes.displayNone]: transition })}
+        className={classNames(classes.marginTop, {
+          [classes.displayNone]: transition
+        })}
       >
         {`${player}'s Turn`}
       </Typography>
