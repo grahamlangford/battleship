@@ -13,11 +13,13 @@ import { direction } from '../../engine/constants'
 import useStyles from './Board.styles'
 
 const Board = ({
+  id,
   game,
   startingShips,
   isOpponent,
   dispatch,
   actions,
+  toggleTransition,
   display
 }) => {
   const classes = useStyles()
@@ -43,7 +45,7 @@ const Board = ({
         if (newShips.length === 0) {
           dispatch(actions.togglePlayer())
           dispatch(actions.incrementTurn())
-          dispatch(actions.toggleTransition())
+          toggleTransition()
         }
 
         setShips(newShips)
@@ -60,16 +62,15 @@ const Board = ({
         if (!game.allSunk()) {
           dispatch(actions.togglePlayer())
           dispatch(actions.incrementTurn())
-          dispatch(actions.toggleTransition())
+          toggleTransition()
         }
       } catch (error) {
         dispatch(actions.setError(error.message))
       }
     }
   }
-
   return (
-    <div className={classNames(display, classes.board)}>
+    <div id={id} className={classNames(display, classes.board)}>
       <Grid container justify="center" spacing={40}>
         <Grid item xs={12} sm={8} md={6}>
           <Grid container justify="center" spacing={0}>
@@ -133,12 +134,21 @@ const Board = ({
 }
 
 Board.propTypes = {
+  id: PropTypes.string,
   game: PropTypes.object.isRequired,
-  startingShips: PropTypes.array.isRequired,
+  startingShips: PropTypes.array,
   isOpponent: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
   actions: PropTypes.object.isRequired,
-  display: PropTypes.string.isRequired
+  toggleTransition: PropTypes.func,
+  display: PropTypes.string
+}
+
+Board.defaultProps = {
+  id: `board-${shortid.generate()}`,
+  startingShips: [],
+  toggleTransition: () => {},
+  display: ''
 }
 
 export default Board

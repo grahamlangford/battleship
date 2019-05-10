@@ -9,6 +9,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 
 import App from './components/App'
 import Pvp from './components/Pvp'
+import PvC from './components/PvC'
 import * as serviceWorker from './serviceWorker'
 
 import theme from './theme'
@@ -23,10 +24,12 @@ const Routes = () => {
         path="/"
         render={() => {
           if (gameType === 'pvp') return <Redirect to="/pvp" />
+          if (gameType === 'ai') return <Redirect to="/ai" />
           return <App setGameType={setGameType} />
         }}
       />
       <Route path="/pvp" component={Pvp} />
+      <Route path="/ai" component={PvC} />
     </Router>
   )
 }

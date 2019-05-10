@@ -7,38 +7,31 @@ import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 
-import pvpReducer, { actions, initialState } from '../../reducers/pvp'
+import pvcReducer, { actions, initialState } from '../../reducers/ai'
+import computer from '../../engine/ai/ai'
 import Board from '../Board'
-import Transition from '../Transition'
-import useStyles from './Pvp.styles'
+import useStyles from './PvC.styles'
+
+const ai = computer()
 
 const Pvp = () => {
   const classes = useStyles()
 
   const [
-    {
-      message,
-      error,
-      player,
-      turn,
-      board,
-      transition,
-      ships1,
-      ships2,
-      game1,
-      game2
-    },
+    { message, error, player, turn, ships1, ships2, game1, game2 },
     dispatch
-  ] = useReducer(pvpReducer, initialState)
+  ] = useReducer(pvcReducer, initialState)
 
   useEffect(() => {
-    if (turn === -2 || turn % 2 === 1) {
-      dispatch(actions.setBoard('Board 1'))
-    } else if (turn === -1 || turn % 2 === 0) {
-      dispatch(actions.setBoard('Board 2'))
+    if (turn === -1) {
+      ships1.forEach(ship => ai.placeShip(ship, game1, 10, 10))
+      dispatch(actions.incrementTurn())
+    } else if (turn > 0 && turn % 2 === 1) {
+      ai.attack(game2, 10, 10)
+      dispatch(actions.incrementTurn())
     }
-  }, [turn])
-
+  }, [turn, game1, game2, ships1])
+  console.log(turn)
   return (
     <>
       <AppBar position="static">
@@ -55,55 +48,32 @@ const Pvp = () => {
       <Typography
         variant="h4"
         align="center"
-        className={classNames(classes.marginTop, {
-          [classes.displayNone]: !transition
-        })}
+        className={classes.marginTop}
         gutterBottom
       >
         {message}
-      </Typography>
-      <Transition
-        player={player}
-        onClick={() => dispatch(actions.toggleTransition())}
-        display={classNames({ [classes.displayNone]: !transition })}
-      />
-      <Typography
-        variant="h3"
-        align="center"
-        gutterBottom
-        className={classNames(classes.marginTop, {
-          [classes.displayNone]: transition
-        })}
-      >
-        {`${player}'s Turn`}
       </Typography>
       <Grid
         className={classes.root}
         spacing={0}
         container
         justify="flex-start"
-        direction={board === 'Board 1' ? 'column' : 'column-reverse'}
+        direction={turn === -2 ? 'column-reverse' : 'column'}
       >
         <Grid item xs={12} className={classes.board}>
           <Board
+            id="game-1"
             game={game1}
-            startingShips={ships1}
-            isOpponent={board === 'Board 2'}
+            isOpponent={turn > -2 && turn % 2 === 1}
             dispatch={dispatch}
             actions={actions}
-            toggleTransition={() => dispatch(actions.toggleTransition())}
             display={classNames({
-              [classes.displayNone]: transition || turn === -1
+              [classes.displayNone]: turn < 0
             })}
           />
         </Grid>
         <Grid item xs={12} className={classes.text}>
-          <Typography
-            variant="h4"
-            align="center"
-            className={classNames({ [classes.displayNone]: transition })}
-            gutterBottom
-          >
+          <Typography variant="h4" align="center" gutterBottom>
             {error}
           </Typography>
           <Typography
@@ -120,22 +90,22 @@ const Pvp = () => {
             align="center"
             gutterBottom
             className={classNames({
-              [classes.displayNone]: transition || turn < 0
+              [classes.displayNone]: turn === -2
             })}
           >
-            Opponent&apos;s Board
+            AI&apos;s Board
           </Typography>
         </Grid>
         <Grid item xs={12} className={classes.board}>
           <Board
+            id="game-2"
             game={game2}
             startingShips={ships2}
-            isOpponent={board === 'Board 1'}
+            isOpponent={turn > -2}
             dispatch={dispatch}
             actions={actions}
-            toggleTransition={() => dispatch(actions.toggleTransition())}
             display={classNames({
-              [classes.displayNone]: transition || turn === -2
+              [classes.displayNone]: turn === -1
             })}
           />
         </Grid>
