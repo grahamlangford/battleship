@@ -53,6 +53,16 @@ const Pvp = () => {
         </ToolBar>
       </AppBar>
       <Typography
+        variant="h3"
+        align="center"
+        className={classNames(classes.marginTop, {
+          [classes.displayNone]: turn >= 0 || transition
+        })}
+        gutterBottom
+      >
+        {`${player} Deploy Ships`}
+      </Typography>
+      <Typography
         variant="h4"
         align="center"
         className={classNames(classes.marginTop, {
@@ -72,7 +82,7 @@ const Pvp = () => {
         align="center"
         gutterBottom
         className={classNames(classes.marginTop, {
-          [classes.displayNone]: transition
+          [classes.displayNone]: turn < 0 || transition
         })}
       >
         {`${player}'s Turn`}

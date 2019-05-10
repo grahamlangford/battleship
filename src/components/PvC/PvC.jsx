@@ -31,7 +31,6 @@ const Pvp = () => {
       dispatch(actions.incrementTurn())
     }
   }, [turn, game1, game2, ships1])
-  console.log(turn)
   return (
     <>
       <AppBar position="static">
@@ -46,6 +45,24 @@ const Pvp = () => {
         </ToolBar>
       </AppBar>
       <Typography
+        variant="h3"
+        align="center"
+        className={classNames(classes.marginTop, {
+          [classes.displayNone]: turn > -2
+        })}
+      >
+        Deploy Ships
+      </Typography>
+      <Typography
+        variant="h3"
+        align="center"
+        className={classNames(classes.marginTop, {
+          [classes.displayNone]: turn === -2
+        })}
+      >
+        Your Board
+      </Typography>
+      <Typography
         variant="h4"
         align="center"
         className={classes.marginTop}
@@ -58,7 +75,7 @@ const Pvp = () => {
         spacing={0}
         container
         justify="flex-start"
-        direction={turn === -2 ? 'column-reverse' : 'column'}
+        direction={turn !== -2 ? 'column' : 'column-reverse'}
       >
         <Grid item xs={12} className={classes.board}>
           <Board
