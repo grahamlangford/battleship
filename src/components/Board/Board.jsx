@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 
-import constants from '../../engine/constants'
+import { direction } from '../../engine/constants'
 import useStyles from './Board.styles'
 
 const Board = ({
@@ -34,7 +34,7 @@ const Board = ({
           selectedShip,
           x,
           y,
-          isVertical ? constants.VERTICAL : constants.HORIZONTAL
+          isVertical ? direction.VERTICAL : direction.HORIZONTAL
         )
 
         const newShips = ships.filter(

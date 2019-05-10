@@ -3,11 +3,11 @@ import ship from '../ship/ship'
 import gameboard from '../gameboard/gameboard'
 
 describe('engine/ai.js', () => {
-  const getShips = game =>
-    game
-      .getState()
-      .map(row => row.filter(el => el !== null))
-      .filter(el => el.length !== 0)
+  const getShips = game => {
+    const state = game.getState()
+    const flattened = [].concat.apply([], state)
+    return flattened.filter(el => el !== null)
+  }
 
   it('can place a ship', () => {
     const ai = computer()
@@ -17,7 +17,7 @@ describe('engine/ai.js', () => {
 
     ai.placeShip(destroyer, game, 10, 10)
 
-    expect(getShips(game).length).not.toBe(0)
+    expect(getShips(game).length).toBe(2)
   })
 
   it('can place multiple ships without overlapping', () => {
@@ -35,6 +35,6 @@ describe('engine/ai.js', () => {
 
     ships.forEach(ship => ai.placeShip(ship, game, 10, 10))
 
-    expect(getShips(game).length).not.toBe(0)
+    expect(getShips(game).length).toBe(17)
   })
 })

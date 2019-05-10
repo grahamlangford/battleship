@@ -1,4 +1,4 @@
-import constants from '../constants'
+import { direction, error as thrownError } from '../constants'
 
 export default () => {
   const getRandomInt = max => {
@@ -7,21 +7,21 @@ export default () => {
 
   const placeShip = (ship, gameboard, columns, rows) => {
     try {
-      const direction =
-        getRandomInt(2) === 0 ? constants.VERTICAL : constants.HORIZONTAL
+      const orientation =
+        getRandomInt(2) === 0 ? direction.VERTICAL : direction.HORIZONTAL
 
       const maxX =
-        direction === constants.HORIZONTAL
+        orientation === direction.HORIZONTAL
           ? columns - ship.getLength()
           : columns - 1
       const maxY =
-        direction === constants.VERTICAL ? rows - ship.getLength() : rows - 1
+        orientation === direction.VERTICAL ? rows - ship.getLength() : rows - 1
       const x = getRandomInt(maxX)
       const y = getRandomInt(maxY)
 
-      gameboard.placeShip(ship, x, y, direction)
+      gameboard.placeShip(ship, x, y, orientation)
     } catch (error) {
-      placeShip(ship, gameboard, columns, rows)
+      if (thrownError.NO_OVERLAP) placeShip(ship, gameboard, columns, rows)
     }
   }
 

@@ -1,6 +1,6 @@
 import gameboard from './gameboard'
 import ship from '../ship/ship'
-import constants from '../constants'
+import { direction } from '../constants'
 
 describe('engine/gameboard.js', () => {
   it('creates a gameboard with rows: 8 and columns: 8', () => {
@@ -66,7 +66,7 @@ describe('engine/gameboard.js', () => {
     game.create(3, 3)
     const destroyer = ship('destroyer', 2)
 
-    game.placeShip(destroyer, 1, 1, constants.VERTICAL)
+    game.placeShip(destroyer, 1, 1, direction.VERTICAL)
     const state = [
       [null, null, null],
       [
@@ -94,7 +94,7 @@ describe('engine/gameboard.js', () => {
     expect(() => game.placeShip(destroyer, 2, 1)).toThrow(
       'Ship must be placed in bounds!'
     )
-    expect(() => game.placeShip(destroyer, 1, 2, constants.VERTICAL)).toThrow(
+    expect(() => game.placeShip(destroyer, 1, 2, direction.VERTICAL)).toThrow(
       'Ship must be placed in bounds!'
     )
   })
@@ -107,7 +107,7 @@ describe('engine/gameboard.js', () => {
 
     game.placeShip(destroyer, 0, 1)
 
-    expect(() => game.placeShip(cruiser, 1, 0, constants.VERTICAL)).toThrow(
+    expect(() => game.placeShip(cruiser, 1, 0, direction.VERTICAL)).toThrow(
       'Ships cannot overlap!'
     )
 
