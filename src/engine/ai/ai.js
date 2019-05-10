@@ -1,8 +1,15 @@
-import { direction, error as thrownError } from '../constants'
+import { direction, error as thrownError, message } from '../constants'
 
 export default () => {
   const getRandomInt = max => {
     return Math.floor(Math.random() * Math.floor(max))
+  }
+
+  const lastAttack = {}
+  const setLastAttack = (x, y, result) => {
+    lastAttack.x = x
+    lastAttack.y = y
+    lastAttack.result = result
   }
 
   const placeShip = (ship, gameboard, columns, rows) => {
@@ -36,5 +43,44 @@ export default () => {
     }
   }
 
-  return { placeShip, attack }
+  const smartAttack = (gameboard, columns, rows) => {
+    console.log(lastAttack)
+    if (lastAttack.result === message.HIT) {
+      const { x, y } = lastAttack
+      if (x > 0) {
+        try {
+          const result = gameboard.receiveAttack(x - 1, y)
+          setLastAttack(x - 1 > 0 ? x - 1 : x, y, result)
+        } catch (error) {
+          if (thrownError.NO_TARGET_TWICE) {
+            try {
+              const result = gameboard.receiveAttack(x + 1, y)
+              setLastAttack(x + 1, y, result)
+            } catch (error2) {
+              console.log(error2)
+            }
+          }
+        }
+      } else if (lastAttack.x < columns - 2) {
+        try {
+          const result = gameboard.receiveAttack(x + 1, y)
+          setLastAttack(x + 1, y, result)
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    } else {
+      try {
+        const x = getRandomInt(columns)
+        const y = getRandomInt(rows)
+        const result = gameboard.receiveAttack(x, y)
+
+        setLastAttack(x, y, result)
+      } catch (error) {
+        if (thrownError.NO_TARGET_TWICE) smartAttack(gameboard, columns, rows)
+      }
+    }
+  }
+
+  return { placeShip, attack, smartAttack }
 }

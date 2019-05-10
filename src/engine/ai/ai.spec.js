@@ -13,6 +13,10 @@ describe('engine/ai.js', () => {
     return getShips(game).filter(el => el === 'miss' || el.hit === 'hit')
   }
 
+  const getHits = game => {
+    return getShips(game).filter(el => el.hit === 'hit')
+  }
+
   it('can place a ship', () => {
     const ai = computer()
     const destroyer = ship('destroyer', 2)
@@ -75,5 +79,38 @@ describe('engine/ai.js', () => {
     }
 
     expect(getHitsAndMisses(game).length).toBe(20)
+  })
+
+  it('ai can make "smart" attacks', () => {
+    const ai = computer()
+    const destroyer = ship('destroyer', 2)
+    const game = gameboard()
+    game.create(10, 10)
+
+    ai.placeShip(destroyer, game, 10, 10)
+
+    ai.smartAttack(game, 10, 10)
+
+    expect(getHitsAndMisses(game).length).toBe(1)
+  })
+
+  it('ai first tries to attack left if possible, right if not when it scores a hit', () => {
+    const ai = computer()
+    const carrier = ship('carrier', 5)
+    const game = gameboard()
+    game.create(10, 10)
+
+    game.placeShip(carrier, 0, 0)
+
+    ai.smartAttack(game, 2, 1)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+
+    console.table(game.getState())
+
+    expect(getHits(game).length).toBe(5)
   })
 })
