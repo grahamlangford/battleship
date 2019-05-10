@@ -25,5 +25,16 @@ export default () => {
     }
   }
 
-  return { placeShip }
+  const attack = (gameboard, columns, rows) => {
+    try {
+      const x = getRandomInt(columns)
+      const y = getRandomInt(rows)
+
+      gameboard.receiveAttack(x, y)
+    } catch (error) {
+      if (thrownError.NO_TARGET_TWICE) attack(gameboard, columns, rows)
+    }
+  }
+
+  return { placeShip, attack }
 }
