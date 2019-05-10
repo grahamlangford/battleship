@@ -27,7 +27,8 @@ const Pvp = () => {
       ships1.forEach(ship => ai.placeShip(ship, game1, 10, 10))
       dispatch(actions.incrementTurn())
     } else if (turn > 0 && turn % 2 === 1) {
-      ai.attack(game2, 10, 10)
+      ai.smartAttack(game2, 10, 10)
+      if (game2.allSunk()) dispatch(actions.setMessage('All sunk!'))
       dispatch(actions.incrementTurn())
     }
   }, [turn, game1, game2, ships1])

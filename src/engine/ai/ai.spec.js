@@ -1,6 +1,7 @@
 import computer from './ai'
 import ship from '../ship/ship'
 import gameboard from '../gameboard/gameboard'
+import { direction } from '../constants'
 
 describe('engine/ai.js', () => {
   const getShips = game => {
@@ -94,7 +95,7 @@ describe('engine/ai.js', () => {
     expect(getHitsAndMisses(game).length).toBe(20)
   })
 
-  xit('ai can make "smart" attacks', () => {
+  it('ai can make "smart" attacks', () => {
     const ai = computer()
     const destroyer = ship('destroyer', 2)
     const game = gameboard()
@@ -143,5 +144,42 @@ describe('engine/ai.js', () => {
     expect(getHits(game).length).toBe(5)
   })
 
-  it('ai switches to up when neither left nor right is working', () => {})
+  it('ai switches to up (increasing y) when neither left nor right is working', () => {
+    const ai = computer()
+    const carrier = ship('carrier', 5)
+    const game = gameboard()
+    game.create(10, 10)
+
+    game.placeShip(carrier, 1, 1, direction.VERTICAL)
+
+    ai.testAttack(game, 1, 1)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+
+    expect(getHits(game).length).toBe(5)
+  })
+
+  it('ai switches to down (decreasing y) when nothing else works', () => {
+    const ai = computer()
+    const carrier = ship('carrier', 5)
+    const game = gameboard()
+    game.create(10, 10)
+
+    game.placeShip(carrier, 1, 1, direction.VERTICAL)
+
+    ai.testAttack(game, 1, 5)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+    ai.smartAttack(game, 10, 10)
+
+    expect(getHits(game).length).toBe(5)
+  })
 })

@@ -29,7 +29,8 @@ export default () => {
 
       gameboard.placeShip(ship, x, y, orientation)
     } catch (error) {
-      if (thrownError.NO_OVERLAP) placeShip(ship, gameboard, columns, rows)
+      if (error.message === thrownError.NO_OVERLAP)
+        placeShip(ship, gameboard, columns, rows)
     }
   }
 
@@ -45,11 +46,12 @@ export default () => {
 
       gameboard.receiveAttack(x, y)
     } catch (error) {
-      if (thrownError.NO_TARGET_TWICE) attack(gameboard, columns, rows)
+      if (error.message === thrownError.NO_TARGET_TWICE)
+        attack(gameboard, columns, rows)
     }
   }
 
-  const tryRandom = (gameboard, columns, rows, smartAttack) => {
+  const tryRandom = (gameboard, columns, rows) => {
     try {
       const randX = getRandomInt(columns)
       const randY = getRandomInt(rows)
@@ -57,19 +59,29 @@ export default () => {
 
       setLastAttack(randX, randY, response)
     } catch (error) {
-      if (thrownError.NO_TARGET_TWICE) smartAttack(gameboard, columns, rows)
+      if (error.message === thrownError.NO_TARGET_TWICE)
+        tryRandom(gameboard, columns, rows)
     }
   }
 
-  const tryLeft = (gameboard, x, y) => {
+  const tryDown = (gameboard, x, y) => {
     try {
-      const response = gameboard.receiveAttack(x - 1, y)
-      setLastAttack(x - 1 > 0 ? x - 1 : x, y, response)
+      const response = gameboard.receiveAttack(x, y - 1)
+      setLastAttack(x, y - 1, response, 'down')
     } catch (error) {
-      if (thrownError.NO_TARGET_TWICE) {
+      console.log(error)
+    }
+  }
+
+  const tryUp = (gameboard, x, y) => {
+    try {
+      const response = gameboard.receiveAttack(x, y + 1)
+      setLastAttack(x, y + 1, response, 'up')
+    } catch (error) {
+      if (error.message === thrownError.NO_TARGET_TWICE) {
         try {
-          const response = gameboard.receiveAttack(x + 1, y)
-          setLastAttack(x + 1, y, response, 'right')
+          const response = gameboard.receiveAttack(x, y + 2)
+          setLastAttack(x, y + 2, response, 'up')
         } catch (error2) {
           console.log(error2)
         }
@@ -90,27 +102,98 @@ export default () => {
     }
   }
 
+  const tryLeft = (gameboard, x, y) => {
+    try {
+      const response = gameboard.receiveAttack(x - 1, y)
+      setLastAttack(x - 1 > 0 ? x - 1 : x, y, response)
+    } catch (error) {
+      if (error.message === thrownError.NO_TARGET_TWICE) {
+        try {
+          const response = gameboard.receiveAttack(x + 1, y)
+          setLastAttack(x + 1, y, response, 'right')
+        } catch (error2) {
+          if (error2.message === thrownError.NO_TARGET_TWICE) {
+            tryUp(gameboard, x, y)
+          } else {
+            console.log('tryLeft error2: ', error2)
+          }
+        }
+      }
+    }
+  }
+
   const smartAttack = (gameboard, columns, rows) => {
     const { x, y, result, next } = lastAttack
 
-    if (result[result.length - 1] === message.HIT && next === 'left') {
-      if (x > 0) {
-        tryLeft(gameboard, x, y)
-      } else if (x < columns - 2) {
+    console.log(result)
+    if (result[result.length - 1] && /sunk/.test(result[result.length - 1])) {
+      console.log('0')
+      tryRandom(gameboard, columns, rows)
+    } else if (result[result.length - 1] === message.HIT) {
+      console.log('1')
+      if (next === 'left') {
+        if (x > 0) {
+          console.log('1.1')
+          tryLeft(gameboard, x, y)
+        } else if (x < columns - 2) {
+          console.log('1.2')
+          tryRight(gameboard, x, y)
+        }
+      } else if (next === 'right' && x < columns - 1) {
+        console.log('1.3')
         tryRight(gameboard, x, y)
+      } else if (next === 'up' && y < rows - 1) {
+        console.log('1.4')
+        tryUp(gameboard, x, y)
+      } else if (next === 'down' && y > 0) {
+        console.log('1.5')
+        tryDown(gameboard, x, y)
       }
-    } else if (
-      result[result.length - 1] === message.MISS &&
-      result[result.length - 2] === message.HIT
-    ) {
+    } else if (result[result.length - 2] === message.HIT) {
+      console.log('2')
       if (x < columns - 2 && next === 'left') {
+        console.log('2.1')
         tryRight(gameboard, x, y)
+      } else if (y < rows - 1 && next === 'right') {
+        console.log('2.2')
+        tryUp(gameboard, x - 1, y)
+      } else if (y < rows - 1 && next === 'up') {
+        console.log('2.3')
+        tryUp(gameboard, x, y)
+      } else {
+        console.log('2.4', next)
       }
-    } else if (next === 'right') {
-      tryRight(gameboard, x, y)
+    } else if (result[result.length - 3] === message.HIT) {
+      console.log('3')
+      if (/sunk/.test(result[result.length - 2])) {
+        console.log('3.0')
+        tryRandom(gameboard, columns, rows)
+      } else if (next === 'right') {
+        console.log('3.1')
+        tryUp(gameboard, x - 1, y)
+      } else {
+        console.log('3.2', next)
+      }
+    } else if (result[result.length - 4] === message.HIT) {
+      console.log('4')
+      if (
+        /sunk/.test(result[result.length - 2]) ||
+        /sunk/.test(result[result.length - 3])
+      ) {
+        console.log('4.0')
+        tryRandom(gameboard, columns, rows)
+      } else if (next === 'up') {
+        console.log('4.1')
+        tryDown(gameboard, x, y - 1)
+      } else {
+        console.log('4.2', next)
+      }
     } else {
-      tryRandom(gameboard, columns, rows, smartAttack)
+      console.log('5')
+      tryRandom(gameboard, columns, rows)
     }
+
+    console.log(lastAttack.result[lastAttack.result.length - 1])
   }
 
   return { placeShip, testAttack, attack, smartAttack }
