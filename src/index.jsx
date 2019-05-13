@@ -16,7 +16,6 @@ import theme from './theme'
 
 const Routes = () => {
   const [gameType, setGameType] = useState({ type: 'home' })
-  console.log('gameType = ', gameType.type)
 
   return (
     <Router>

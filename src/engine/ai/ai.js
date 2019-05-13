@@ -13,6 +13,13 @@ export default () => {
     lastAttack.next = next
   }
 
+  const reset = () => {
+    lastAttack.x = -1
+    lastAttack.y = -1
+    lastAttack.result = []
+    lastAttack.next = 'left'
+  }
+
   const placeShip = (ship, gameboard, columns, rows) => {
     try {
       const orientation =
@@ -70,13 +77,15 @@ export default () => {
       setLastAttack(x, y - 1, response, 'down')
     } catch (error) {
       if (error.message === thrownError.NO_TARGET_TWICE && y - 1 > 0) {
-        try {
-          tryDown(gameboard, x, y - 1)
-        } catch (error2) {
-          console.log('tryDown error2: ', error2)
-        }
+        tryDown(gameboard, x, y - 1)
+      } else if (error.message === thrownError.NO_TARGET_TWICE) {
+        tryRandom(
+          gameboard,
+          gameboard.getState().length,
+          gameboard.getState()[0].length
+        )
       } else {
-        console.log('tryDown error1: ', error)
+        console.log('tryDown error: ', error)
       }
     }
   }
@@ -87,13 +96,11 @@ export default () => {
       setLastAttack(x, y + 1, response, 'up')
     } catch (error) {
       if (error.message === thrownError.NO_TARGET_TWICE) {
-        try {
-          tryUp(gameboard, x, y + 1)
-        } catch (error2) {
-          console.log('tryUp error2: ', error2)
-        }
+        tryUp(gameboard, x, y + 1)
+      } else if (error.message === thrownError.INVALID_LOCATION) {
+        tryDown(gameboard, x, y)
       } else {
-        console.log('tryUp error1: ', error)
+        console.log('tryUp error: ', error)
       }
     }
   }
@@ -105,7 +112,13 @@ export default () => {
     } catch (error) {
       if (error.message === thrownError.NO_TARGET_TWICE)
         tryRight(gameboard, x + 1, y)
-      else {
+      else if (error.message === thrownError.INVALID_LOCATION) {
+        tryRandom(
+          gameboard,
+          gameboard.getState().length,
+          gameboard.getState()[0].length
+        )
+      } else {
         console.log(error)
       }
     }
@@ -186,8 +199,11 @@ export default () => {
       } else if (next === 'up') {
         console.log('3.3')
         tryDown(gameboard, x, y)
+      } else if (next === 'down') {
+        console.log('3.4')
+        tryRandom(gameboard, columns, rows)
       } else {
-        console.log('3.4', next)
+        console.log('3.5', next)
       }
     } else if (result[result.length - 4] === message.HIT) {
       console.log('4')
@@ -197,11 +213,20 @@ export default () => {
       ) {
         console.log('4.0')
         tryRandom(gameboard, columns, rows)
-      } else if (next === 'up') {
+      } else if (next === 'left') {
         console.log('4.1')
+        tryRight(gameboard, x, y)
+      } else if (next === 'right') {
+        console.log('4.2')
+        tryUp(gameboard, x - 1, y)
+      } else if (next === 'up') {
+        console.log('4.3')
         tryDown(gameboard, x, y - 1)
+      } else if (next === 'down') {
+        console.log('4.4')
+        tryRandom(gameboard, columns, rows)
       } else {
-        console.log('4.2', next)
+        console.log('4.5', next)
       }
     } else {
       console.log('5')
@@ -211,5 +236,5 @@ export default () => {
     console.log(lastAttack.result[lastAttack.result.length - 1])
   }
 
-  return { placeShip, testAttack, attack, smartAttack }
+  return { placeShip, testAttack, attack, smartAttack, reset }
 }

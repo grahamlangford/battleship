@@ -1,6 +1,5 @@
 import gameboard from '../engine/gameboard/gameboard'
 import ship from '../engine/ship/ship'
-import computer from '../engine/ai/ai'
 
 const getShips = () => [
   ship('destroyer', 2),
@@ -15,10 +14,6 @@ const getGame = () => {
   game.create(10, 10)
   return game
 }
-
-const ai = computer()
-const attack = (difficulty, game) =>
-  difficulty === 0 ? ai.attack(game, 10, 10) : ai.smartAttack(game, 10, 10)
 
 const constants = {
   DIFFICULTY: 'DIFFICULTY',
@@ -41,9 +36,6 @@ export const actions = {
   reset: () => ({ type: constants.RESET })
 }
 
-const game1 = getGame()
-const game2 = getGame()
-
 export const initialState = {
   difficulty: 0,
   message: '',
@@ -53,10 +45,8 @@ export const initialState = {
   transition: true,
   ships1: getShips(),
   ships2: getShips(),
-  game1,
-  game2,
-  ai,
-  attack: () => attack(0, game2)
+  game1: getGame(),
+  game2: getGame()
 }
 
 export default (state, action) => {
@@ -64,8 +54,7 @@ export default (state, action) => {
     case constants.DIFFICULTY:
       return {
         ...state,
-        difficulty: action.payload,
-        attack: () => attack(action.payload, game2)
+        difficulty: action.payload
       }
     case constants.SET_MESSAGE:
       return { ...state, message: action.payload }
@@ -78,17 +67,15 @@ export default (state, action) => {
     }
     case constants.INCREMENT_TURN:
       return { ...state, turn: state.turn + 1 }
-    case constants.RESET: {
-      const newGame2 = getGame()
+    case constants.RESET:
       return {
         ...initialState,
         ships1: getShips(),
         ships2: getShips(),
         game1: getGame(),
-        game2: newGame2,
-        attack: () => attack(0, newGame2)
+        game2: getGame()
       }
-    }
+
     default: {
       throw new Error('Invalid dispatch type')
     }

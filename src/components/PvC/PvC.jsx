@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react'
+import React, { useReducer, useEffect, useLayoutEffect } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -15,29 +15,27 @@ import FilledInput from '@material-ui/core/FilledInput'
 import MenuItem from '@material-ui/core/MenuItem'
 import Grid from '@material-ui/core/Grid'
 
+import computer from '../../engine/ai/ai'
 import pvcReducer, { actions, initialState } from '../../reducers/ai'
 import Board from '../Board'
 import useStyles from './PvC.styles'
+
+const ai = computer()
 
 const PvC = ({ goHome }) => {
   const classes = useStyles()
 
   const [
-    {
-      difficulty,
-      message,
-      error,
-      player,
-      turn,
-      ships1,
-      ships2,
-      game1,
-      game2,
-      ai,
-      attack
-    },
+    { difficulty, message, error, player, turn, ships1, ships2, game1, game2 },
     dispatch
   ] = useReducer(pvcReducer, initialState)
+
+  const attack = difficulty === 0 ? ai.attack : ai.smartAttack
+
+  useLayoutEffect(() => {
+    if (/has been sunk/.test(message) && !/'s/.test(message))
+      dispatch(actions.setMessage(`${player}'s ${message}`))
+  }, [message, player])
 
   useEffect(() => {
     if (turn === -1) {
@@ -45,14 +43,14 @@ const PvC = ({ goHome }) => {
       dispatch(actions.incrementTurn())
       dispatch(actions.togglePlayer())
     } else if (turn > 0 && turn % 2 === 1) {
-      attack()
+      attack(game2, 10, 10)
       if (game2.allSunk()) dispatch(actions.setMessage('All sunk!'))
       else {
         dispatch(actions.incrementTurn())
         dispatch(actions.togglePlayer())
       }
     }
-  }, [turn, game1, game2, ships1, ai, attack])
+  }, [turn, game1, game2, ships1, attack])
 
   return (
     <>
@@ -62,7 +60,13 @@ const PvC = ({ goHome }) => {
             Battleship
           </Typography>
           <div className={classes.grow} />
-          <Button color="inherit" onClick={() => dispatch(actions.reset())}>
+          <Button
+            color="inherit"
+            onClick={() => {
+              dispatch(actions.reset())
+              ai.reset()
+            }}
+          >
             New Game
           </Button>
           <IconButton aria-label="Home" color="inherit" onClick={goHome}>

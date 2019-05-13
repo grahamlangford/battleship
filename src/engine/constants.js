@@ -15,5 +15,5 @@ export const error = {
 export const message = {
   MISS: 'Miss!',
   HIT: 'Hit!',
-  SUNK: ship => `The ${ship} has been sunk!`
+  SUNK: ship => `${ship} has been sunk!`
 }
