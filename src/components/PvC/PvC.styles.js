@@ -2,10 +2,10 @@ import { makeStyles } from '@material-ui/styles'
 
 export default makeStyles({
   displayNone: {
-    display: 'none'
+    display: 'none !important'
   },
   displayBlock: {
-    display: 'block'
+    display: 'block !important'
   },
   root: {
     width: '100%'
@@ -23,6 +23,13 @@ export default makeStyles({
   },
   grow: {
     flexGrow: 1
+  },
+  form: {
+    height: 200,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-evenly'
   },
   formControl: {
     margin: 8,

@@ -46,8 +46,6 @@ const PvC = ({ goHome }) => {
       dispatch(actions.togglePlayer())
     } else if (turn > 0 && turn % 2 === 1) {
       attack()
-      console.log(player)
-
       if (game2.allSunk()) dispatch(actions.setMessage('All sunk!'))
       else {
         dispatch(actions.incrementTurn())
@@ -74,12 +72,14 @@ const PvC = ({ goHome }) => {
       </AppBar>
 
       <form
-        className={classNames({
+        className={classNames(classes.form, {
           [classes.displayNone]: turn > -3
         })}
       >
         <FormControl variant="filled" className={classes.formControl}>
-          <InputLabel htmlFor="set-difficulty">Set Difficulty</InputLabel>
+          <InputLabel htmlFor="set-difficulty" variant="filled">
+            Set Difficulty
+          </InputLabel>
           <Select
             value={difficulty}
             onChange={e => dispatch(actions.setDifficulty(e.target.value))}
@@ -135,7 +135,9 @@ const PvC = ({ goHome }) => {
           <Board
             id="game-1"
             game={game1}
-            isOpponent={turn > -2 && turn % 2 === 1}
+            isOpponent={
+              (turn > -2 && turn % 2 === 1) || message === 'All sunk!'
+            }
             dispatch={dispatch}
             actions={actions}
             display={classNames({

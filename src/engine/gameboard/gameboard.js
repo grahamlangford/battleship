@@ -54,6 +54,8 @@ export default () => {
   }
 
   const receiveAttack = (column, row) => {
+    if (column >= gameboard.length || row >= gameboard[0].length)
+      throw new Error(error.INVALID_LOCATION)
     if (!gameboard[column][row]) {
       gameboard[column][row] = 'miss'
       return message.MISS
