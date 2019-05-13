@@ -8,20 +8,34 @@ import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import HomeIcon from '@material-ui/icons/Home'
+import FormControl from '@material-ui/core/FormControl'
+import InputLabel from '@material-ui/core/InputLabel'
+import Select from '@material-ui/core/Select'
+import FilledInput from '@material-ui/core/FilledInput'
+import MenuItem from '@material-ui/core/MenuItem'
 import Grid from '@material-ui/core/Grid'
 
 import pvcReducer, { actions, initialState } from '../../reducers/ai'
-import computer from '../../engine/ai/ai'
 import Board from '../Board'
 import useStyles from './PvC.styles'
-
-const ai = computer()
 
 const PvC = ({ goHome }) => {
   const classes = useStyles()
 
   const [
-    { message, error, player, turn, ships1, ships2, game1, game2 },
+    {
+      difficulty,
+      message,
+      error,
+      player,
+      turn,
+      ships1,
+      ships2,
+      game1,
+      game2,
+      ai,
+      attack
+    },
     dispatch
   ] = useReducer(pvcReducer, initialState)
 
@@ -29,12 +43,19 @@ const PvC = ({ goHome }) => {
     if (turn === -1) {
       ships1.forEach(ship => ai.placeShip(ship, game1, 10, 10))
       dispatch(actions.incrementTurn())
+      dispatch(actions.togglePlayer())
     } else if (turn > 0 && turn % 2 === 1) {
-      ai.smartAttack(game2, 10, 10)
+      attack()
+      console.log(player)
+
       if (game2.allSunk()) dispatch(actions.setMessage('All sunk!'))
-      dispatch(actions.incrementTurn())
+      else {
+        dispatch(actions.incrementTurn())
+        dispatch(actions.togglePlayer())
+      }
     }
-  }, [turn, game1, game2, ships1])
+  }, [turn, game1, game2, ships1, ai, attack])
+
   return (
     <>
       <AppBar position="static">
@@ -51,11 +72,37 @@ const PvC = ({ goHome }) => {
           </IconButton>
         </ToolBar>
       </AppBar>
+
+      <form
+        className={classNames({
+          [classes.displayNone]: turn > -3
+        })}
+      >
+        <FormControl variant="filled" className={classes.formControl}>
+          <InputLabel htmlFor="set-difficulty">Set Difficulty</InputLabel>
+          <Select
+            value={difficulty}
+            onChange={e => dispatch(actions.setDifficulty(e.target.value))}
+            input={<FilledInput name="difficulty" id="set-difficulty" />}
+          >
+            <MenuItem value={0}>Easy</MenuItem>
+            <MenuItem value={1}>Hard</MenuItem>
+          </Select>
+        </FormControl>
+        <Button
+          variant="contained"
+          onClick={() => dispatch(actions.incrementTurn())}
+          className={classes.button}
+        >
+          Continue
+        </Button>
+      </form>
+
       <Typography
         variant="h3"
         align="center"
         className={classNames(classes.marginTop, {
-          [classes.displayNone]: turn > -2
+          [classes.displayNone]: turn === -3 || turn > -2
         })}
       >
         Deploy Ships
@@ -64,7 +111,7 @@ const PvC = ({ goHome }) => {
         variant="h3"
         align="center"
         className={classNames(classes.marginTop, {
-          [classes.displayNone]: turn === -2
+          [classes.displayNone]: turn < 0
         })}
       >
         Your Board
@@ -114,7 +161,7 @@ const PvC = ({ goHome }) => {
             align="center"
             gutterBottom
             className={classNames({
-              [classes.displayNone]: turn === -2
+              [classes.displayNone]: turn < -1
             })}
           >
             AI&apos;s Board
@@ -129,7 +176,7 @@ const PvC = ({ goHome }) => {
             dispatch={dispatch}
             actions={actions}
             display={classNames({
-              [classes.displayNone]: turn === -1
+              [classes.displayNone]: turn === -3 || turn === -1
             })}
           />
         </Grid>

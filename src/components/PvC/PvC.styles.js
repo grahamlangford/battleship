@@ -23,5 +23,13 @@ export default makeStyles({
   },
   grow: {
     flexGrow: 1
+  },
+  formControl: {
+    margin: 8,
+    minWidth: 180
+  },
+  button: {
+    margin: 16,
+    display: 'block'
   }
 })

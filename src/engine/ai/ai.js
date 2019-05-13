@@ -118,8 +118,7 @@ export default () => {
     } catch (error) {
       if (error.message === thrownError.NO_TARGET_TWICE) {
         try {
-          const response = gameboard.receiveAttack(x + 1, y)
-          setLastAttack(x + 1, y, response, 'right')
+          tryRight(gameboard, x, y)
         } catch (error2) {
           if (error2.message === thrownError.NO_TARGET_TWICE) {
             tryUp(gameboard, x, y)
@@ -178,14 +177,17 @@ export default () => {
       if (/sunk/.test(result[result.length - 2])) {
         console.log('3.0')
         tryRandom(gameboard, columns, rows)
-      } else if (next === 'right') {
+      } else if (next === 'left') {
         console.log('3.1')
+        tryRight(gameboard, x, y)
+      } else if (next === 'right') {
+        console.log('3.2')
         tryUp(gameboard, x - 1, y)
       } else if (next === 'up') {
-        console.log('3.2')
+        console.log('3.3')
         tryDown(gameboard, x, y)
       } else {
-        console.log('3.3', next)
+        console.log('3.4', next)
       }
     } else if (result[result.length - 4] === message.HIT) {
       console.log('4')
