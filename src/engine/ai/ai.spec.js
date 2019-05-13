@@ -182,4 +182,17 @@ describe('engine/ai.js', () => {
 
     expect(getHits(game).length).toBe(5)
   })
+
+  it('ai can make "cheaty" attacks', () => {
+    const ai = computer()
+    const destroyer = ship('destroyer', 2)
+    const game = gameboard()
+    game.create(10, 10)
+
+    ai.placeShip(destroyer, game, 10, 10)
+
+    ai.cheatyAttack(game, 10, 10, 5)
+
+    expect(getHitsAndMisses(game).length).toBe(1)
+  })
 })

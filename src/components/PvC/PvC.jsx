@@ -1,4 +1,9 @@
-import React, { useReducer, useEffect, useLayoutEffect } from 'react'
+import React, {
+  useReducer,
+  useEffect,
+  useLayoutEffect,
+  useCallback
+} from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -30,7 +35,20 @@ const PvC = ({ goHome }) => {
     dispatch
   ] = useReducer(pvcReducer, initialState)
 
-  const attack = difficulty === 0 ? ai.attack : ai.smartAttack
+  const attack = useCallback(() => {
+    switch (difficulty) {
+      case 0:
+        return ai.attack(game2, 10, 10)
+      case 1:
+        return ai.smartAttack(game2, 10, 10)
+      case 2:
+        return ai.cheatyAttack(game2, 10, 10, 10)
+      case 3:
+        return ai.smartAttack(game2, 10, 10, 5)
+      default:
+        return null
+    }
+  }, [difficulty, game2])
 
   useLayoutEffect(() => {
     if (/has been sunk/.test(message) && !/'s/.test(message))
@@ -43,7 +61,7 @@ const PvC = ({ goHome }) => {
       dispatch(actions.incrementTurn())
       dispatch(actions.togglePlayer())
     } else if (turn > 0 && turn % 2 === 1) {
-      attack(game2, 10, 10)
+      attack()
       if (game2.allSunk()) dispatch(actions.setMessage('All sunk!'))
       else {
         dispatch(actions.incrementTurn())
@@ -91,6 +109,8 @@ const PvC = ({ goHome }) => {
           >
             <MenuItem value={0}>Easy</MenuItem>
             <MenuItem value={1}>Hard</MenuItem>
+            <MenuItem value={2}>Cheat</MenuItem>
+            <MenuItem value={3}>Hard &amp; Cheat</MenuItem>
           </Select>
         </FormControl>
         <Button

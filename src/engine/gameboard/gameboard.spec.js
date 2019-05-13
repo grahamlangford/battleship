@@ -3,6 +3,16 @@ import ship from '../ship/ship'
 import { direction } from '../constants'
 
 describe('engine/gameboard.js', () => {
+  const getShips = game => {
+    const state = game.getState()
+    const flattened = [].concat.apply([], state)
+    return flattened.filter(el => el !== null)
+  }
+
+  const getHitsAndMisses = game => {
+    return getShips(game).filter(el => el === 'miss' || el.hit === 'hit')
+  }
+
   it('creates a gameboard with rows: 8 and columns: 8', () => {
     const game = gameboard()
     game.create(8, 8)
@@ -140,7 +150,7 @@ describe('engine/gameboard.js', () => {
     game.placeShip(destroyer, 0, 1)
 
     game.receiveAttack(0, 1)
-    expect(game.receiveAttack(1, 1)).toBe('The destroyer has been sunk!')
+    expect(game.receiveAttack(1, 1)).toBe('destroyer has been sunk!')
   })
 
   it('cannot attack the same place twice', () => {
@@ -159,5 +169,38 @@ describe('engine/gameboard.js', () => {
     expect(() => game.receiveAttack(2, 2)).toThrow(
       'Cannot target same place twice!'
     )
+  })
+
+  it('cheatyAttack lets the AI does not record misses so long as there are retries', () => {
+    const game = gameboard()
+    game.create(3, 3)
+    const destroyer = ship('destroyer', 2)
+
+    game.placeShip(destroyer, 0, 1)
+    game.receiveAttack(2, 2, 5)
+
+    expect(getHitsAndMisses(game).length).toBe(0)
+  })
+
+  it('cheatyAttack records misses when retries is zero', () => {
+    const game = gameboard()
+    game.create(3, 3)
+    const destroyer = ship('destroyer', 2)
+
+    game.placeShip(destroyer, 0, 1)
+    game.receiveAttack(2, 2, 0)
+
+    expect(getHitsAndMisses(game).length).toBe(1)
+  })
+
+  it('cheatyAttack does record hits', () => {
+    const game = gameboard()
+    game.create(3, 3)
+    const destroyer = ship('destroyer', 2)
+
+    game.placeShip(destroyer, 0, 1)
+    game.receiveAttack(0, 1, 5)
+
+    expect(getHitsAndMisses(game).length).toBe(1)
   })
 })

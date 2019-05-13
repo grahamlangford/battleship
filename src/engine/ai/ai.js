@@ -58,16 +58,18 @@ export default () => {
     }
   }
 
-  const tryRandom = (gameboard, columns, rows) => {
+  const tryRandom = (gameboard, columns, rows, retries) => {
     try {
       const randX = getRandomInt(columns)
       const randY = getRandomInt(rows)
-      const response = gameboard.receiveAttack(randX, randY)
-
-      setLastAttack(randX, randY, response)
+      const response = gameboard.receiveAttack(randX, randY, retries)
+      console.log(`Response: ${response}, Retries: ${retries}`)
+      if (response === message.MISS && retries > 0)
+        tryRandom(gameboard, columns, rows, retries - 1)
+      else setLastAttack(randX, randY, response)
     } catch (error) {
       if (error.message === thrownError.NO_TARGET_TWICE)
-        tryRandom(gameboard, columns, rows)
+        tryRandom(gameboard, columns, rows, retries)
     }
   }
 
@@ -143,13 +145,13 @@ export default () => {
     }
   }
 
-  const smartAttack = (gameboard, columns, rows) => {
+  const smartAttack = (gameboard, columns, rows, retries = 0) => {
     const { x, y, result, next } = lastAttack
 
     console.log(result)
     if (result[result.length - 1] && /sunk/.test(result[result.length - 1])) {
       console.log('0')
-      tryRandom(gameboard, columns, rows)
+      tryRandom(gameboard, columns, rows, retries)
     } else if (result[result.length - 1] === message.HIT) {
       console.log('1')
       if (next === 'left') {
@@ -183,7 +185,7 @@ export default () => {
         tryDown(gameboard, x, y)
       } else {
         console.log('2.4')
-        tryRandom(gameboard, columns, rows)
+        tryRandom(gameboard, columns, rows, retries)
       }
     } else if (result[result.length - 3] === message.HIT) {
       console.log('3')
@@ -201,7 +203,7 @@ export default () => {
         tryDown(gameboard, x, y)
       } else if (next === 'down') {
         console.log('3.4')
-        tryRandom(gameboard, columns, rows)
+        tryRandom(gameboard, columns, rows, retries)
       } else {
         console.log('3.5', next)
       }
@@ -212,7 +214,7 @@ export default () => {
         /sunk/.test(result[result.length - 3])
       ) {
         console.log('4.0')
-        tryRandom(gameboard, columns, rows)
+        tryRandom(gameboard, columns, rows, retries)
       } else if (next === 'left') {
         console.log('4.1')
         tryRight(gameboard, x, y)
@@ -224,17 +226,31 @@ export default () => {
         tryDown(gameboard, x, y - 1)
       } else if (next === 'down') {
         console.log('4.4')
-        tryRandom(gameboard, columns, rows)
+        tryRandom(gameboard, columns, rows, retries)
       } else {
         console.log('4.5', next)
       }
     } else {
       console.log('5')
-      tryRandom(gameboard, columns, rows)
+      tryRandom(gameboard, columns, rows, retries)
     }
 
     console.log(lastAttack.result[lastAttack.result.length - 1])
   }
 
-  return { placeShip, testAttack, attack, smartAttack, reset }
+  const cheatyAttack = (gameboard, columns, rows, retries) => {
+    try {
+      const x = getRandomInt(columns)
+      const y = getRandomInt(rows)
+
+      const response = gameboard.receiveAttack(x, y, retries)
+      if (response === message.MISS && retries > 0)
+        cheatyAttack(gameboard, columns, rows, retries - 1)
+    } catch (error) {
+      if (error.message === thrownError.NO_TARGET_TWICE)
+        attack(gameboard, columns, rows)
+    }
+  }
+
+  return { placeShip, testAttack, attack, smartAttack, cheatyAttack, reset }
 }
