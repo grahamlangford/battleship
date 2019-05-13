@@ -63,7 +63,7 @@ export default () => {
       const randX = getRandomInt(columns)
       const randY = getRandomInt(rows)
       const response = gameboard.receiveAttack(randX, randY, retries)
-      console.log(`Response: ${response}, Retries: ${retries}`)
+
       if (response === message.MISS && retries > 0)
         tryRandom(gameboard, columns, rows, retries - 1)
       else setLastAttack(randX, randY, response)

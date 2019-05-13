@@ -44,7 +44,7 @@ const PvC = ({ goHome }) => {
       case 2:
         return ai.cheatyAttack(game2, 10, 10, 10)
       case 3:
-        return ai.smartAttack(game2, 10, 10, 5)
+        return ai.smartAttack(game2, 10, 10, 10)
       default:
         return null
     }
