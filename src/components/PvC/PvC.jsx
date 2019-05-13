@@ -1,10 +1,13 @@
 import React, { useReducer, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import AppBar from '@material-ui/core/AppBar'
 import ToolBar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
+import HomeIcon from '@material-ui/icons/Home'
 import Grid from '@material-ui/core/Grid'
 
 import pvcReducer, { actions, initialState } from '../../reducers/ai'
@@ -14,7 +17,7 @@ import useStyles from './PvC.styles'
 
 const ai = computer()
 
-const Pvp = () => {
+const PvC = ({ goHome }) => {
   const classes = useStyles()
 
   const [
@@ -43,6 +46,9 @@ const Pvp = () => {
           <Button color="inherit" onClick={() => dispatch(actions.reset())}>
             New Game
           </Button>
+          <IconButton aria-label="Home" color="inherit" onClick={goHome}>
+            <HomeIcon />
+          </IconButton>
         </ToolBar>
       </AppBar>
       <Typography
@@ -132,4 +138,8 @@ const Pvp = () => {
   )
 }
 
-export default Pvp
+PvC.propTypes = {
+  goHome: PropTypes.func.isRequired
+}
+
+export default PvC

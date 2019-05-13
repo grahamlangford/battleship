@@ -2,10 +2,13 @@ import { makeStyles } from '@material-ui/styles'
 
 export default makeStyles({
   root: {
-    width: '100%'
+    height: 200,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-evenly'
   },
-  item: {
-    flex: '1 1 auto',
-    width: '100%'
+  button: {
+    minWidth: 220
   }
 })

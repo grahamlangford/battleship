@@ -5,7 +5,6 @@ import AppBar from '@material-ui/core/AppBar'
 import ToolBar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
 
 import useStyles from './App.styles'
 
@@ -21,18 +20,22 @@ const App = ({ setGameType }) => {
           </Typography>
         </ToolBar>
       </AppBar>
-      <Grid className={classes.root} spacing={0} container justify="center">
-        <Grid item xs={12} className={classes.item}>
-          <Button variant="contained" onClick={() => setGameType('pvp')}>
-            Player vs Player
-          </Button>
-        </Grid>
-        <Grid item xs={12} className={classes.item}>
-          <Button variant="contained" onClick={() => setGameType('ai')}>
-            Player vs Computer
-          </Button>
-        </Grid>
-      </Grid>
+      <div className={classes.root}>
+        <Button
+          variant="contained"
+          onClick={() => setGameType({ type: 'pvp' })}
+          className={classes.button}
+        >
+          Player vs Player
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => setGameType({ type: 'ai' })}
+          className={classes.button}
+        >
+          Player vs Computer
+        </Button>
+      </div>
     </>
   )
 }

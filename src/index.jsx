@@ -15,7 +15,8 @@ import * as serviceWorker from './serviceWorker'
 import theme from './theme'
 
 const Routes = () => {
-  const [gameType, setGameType] = useState('')
+  const [gameType, setGameType] = useState({ type: 'home' })
+  console.log('gameType = ', gameType.type)
 
   return (
     <Router>
@@ -23,13 +24,25 @@ const Routes = () => {
         exact
         path="/"
         render={() => {
-          if (gameType === 'pvp') return <Redirect to="/pvp" />
-          if (gameType === 'ai') return <Redirect to="/ai" />
+          if (gameType.type === 'pvp') return <Redirect to="/pvp" />
+          if (gameType.type === 'ai') return <Redirect to="/ai" />
           return <App setGameType={setGameType} />
         }}
       />
-      <Route path="/pvp" component={Pvp} />
-      <Route path="/ai" component={PvC} />
+      <Route
+        path="/pvp"
+        render={props => {
+          if (gameType.type === 'home') return <Redirect to="/" />
+          return <Pvp {...props} goHome={() => setGameType({ type: 'home' })} />
+        }}
+      />
+      <Route
+        path="/ai"
+        render={props => {
+          if (gameType.type === 'home') return <Redirect to="/" />
+          return <PvC {...props} goHome={() => setGameType({ type: 'home' })} />
+        }}
+      />
     </Router>
   )
 }
