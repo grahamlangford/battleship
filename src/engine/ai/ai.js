@@ -161,16 +161,22 @@ export default () => {
         } else if (x < columns - 2) {
           console.log('1.2')
           tryRight(gameboard, x, y)
+        } else {
+          console.log('1.3')
+          tryRandom(gameboard, columns, rows, retries)
         }
       } else if (next === 'right' && x < columns - 1) {
-        console.log('1.3')
+        console.log('1.4')
         tryRight(gameboard, x, y)
       } else if (next === 'up' && y < rows - 1) {
-        console.log('1.4')
+        console.log('1.5')
         tryUp(gameboard, x, y)
       } else if (next === 'down' && y > 0) {
-        console.log('1.5')
+        console.log('1.6')
         tryDown(gameboard, x, y)
+      } else {
+        console.log('1.7')
+        tryRandom(gameboard, columns, rows, retries)
       }
     } else if (result[result.length - 2] === message.HIT) {
       console.log('2')
@@ -206,6 +212,7 @@ export default () => {
         tryRandom(gameboard, columns, rows, retries)
       } else {
         console.log('3.5', next)
+        tryRandom(gameboard, columns, rows, retries)
       }
     } else if (result[result.length - 4] === message.HIT) {
       console.log('4')
